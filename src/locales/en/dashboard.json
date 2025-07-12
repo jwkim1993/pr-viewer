@@ -1,0 +1,95 @@
+{
+  "title": "Dashboard",
+  "lastUpdated": "Last updated",
+  "refreshing": "Refreshing...",
+  "switchToWidgetMode": "Switch to Widget Mode",
+  "switchToNormalMode": "Switch to Normal Mode",
+  "pullRequests": {
+    "title": "Pull Requests",
+    "empty": "No repositories to watch",
+    "loading": "Loading Pull Requests...",
+    "error": "Error occurred while loading Pull Requests",
+    "refresh": "Refresh",
+    "openInGitHub": "View on GitHub"
+  },
+  "repository": {
+    "title": "Repositories",
+    "add": "Add Repository",
+    "remove": "Remove Repository",
+    "watching": "Watching Repositories",
+    "available": "Available Repositories",
+    "search": "Search repositories",
+    "noRepos": "No repositories found",
+    "loadingRepos": "Loading repositories...",
+    "watchedListTitle": "Watched List ({{count}} repositories)",
+    "watchedListTitle_other": "Watched List ({{count}} repositories)",
+    "noWatchedRepos": "No repositories have been added to your watch list yet.",
+    "addReposHint": "Select repositories below to add them to your watch list.",
+    "removeFromWatchlist": "Remove from watch list",
+    "noDescription": "No description",
+    "availableReposTitle": "Available Repositories ({{count}} repositories)",
+    "availableReposTitle_other": "Available Repositories ({{count}} repositories)",
+    "searchPlaceholder": "Search repositories...",
+    "addToWatchlist": "Add to watch list"
+  },
+  "loading": {
+    "pullRequests": "Loading Pull Requests...",
+    "repositories": "Loading repository list...",
+    "updating": "Updating..."
+  },
+  "emptyState": {
+    "noWatchedRepos": "Watch list is empty",
+    "addReposDescription": "Add repositories of interest from the Repositories tab.",
+    "noPullRequests": "No Pull Requests",
+    "noPullRequestsDescription": "There are currently no open Pull Requests in your watched repositories."
+  },
+  "filters": {
+    "allRepositories": "All repositories ({{count}} repositories)",
+    "allRepositories_other": "All repositories ({{count}} repositories)",
+    "itemCount": "({{count}} items)",
+    "itemCount_other": "({{count}} items)"
+  },
+  "sort": {
+    "recentUpdates": "Recent updates",
+    "creationDate": "Creation date",
+    "repositoryName": "Repository name"
+  },
+  "pullRequest": {
+    "approvalCount": "{{count}} approval",
+    "approvalCount_other": "{{count}} approvals",
+    "pendingApproval": "Pending approval",
+    "commentsCount": "{{count}} comment",
+    "commentsCount_other": "{{count}} comments",
+    "created": "Created: {{time}}",
+    "updated": "Updated: {{time}}"
+  },
+  "status": {
+    "open": "Open",
+    "closed": "Closed",
+    "merged": "Merged",
+    "approved": "Approved",
+    "changes_requested": "Changes Requested",
+    "pending": "Pending"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "weeksAgo": "{{count}} week ago",
+    "weeksAgo_other": "{{count}} weeks ago",
+    "monthsAgo": "{{count}} month ago",
+    "monthsAgo_other": "{{count}} months ago"
+  },
+  "stats": {
+    "comments": "{{count}} comment",
+    "comments_other": "{{count}} comments",
+    "approvals": "{{count}} approval",
+    "approvals_other": "{{count}} approvals",
+    "reviews": "{{count}} review",
+    "reviews_other": "{{count}} reviews"
+  }
+}

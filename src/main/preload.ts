@@ -14,4 +14,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onWidgetModeChanged: (callback: (isWidget: boolean) => void) => {
     ipcRenderer.on('widget-mode-changed', (_, isWidget) => callback(isWidget));
   },
+  setLanguage: (language: string) => ipcRenderer.invoke('set-language', language),
+  getLanguage: () => ipcRenderer.invoke('get-language'),
+  onLanguageChanged: (callback: (language: string) => void) => {
+    ipcRenderer.on('language-changed', (_, language) => callback(language));
+  },
+  setRefreshInterval: (interval: number) => ipcRenderer.invoke('set-refresh-interval', interval),
+  getRefreshInterval: () => ipcRenderer.invoke('get-refresh-interval'),
 });

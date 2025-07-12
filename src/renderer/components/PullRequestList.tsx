@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PullRequest {
   id: number;
@@ -40,6 +41,7 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
   loading,
   watchedReposCount 
 }) => {
+  const { t, i18n } = useTranslation('dashboard');
   const [sortBy, setSortBy] = useState<'updated' | 'created' | 'repository'>('updated');
   const [filterRepo, setFilterRepo] = useState<string>('all');
 
@@ -71,21 +73,22 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
-    if (diffInHours < 1) return '방금 전';
-    if (diffInHours < 24) return `${diffInHours}시간 전`;
+    if (diffInHours < 1) return t('time.justNow');
+    if (diffInHours < 24) return t('time.hoursAgo', { count: diffInHours });
     
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}일 전`;
+    if (diffInDays < 7) return t('time.daysAgo', { count: diffInDays });
     
-    return date.toLocaleDateString('ko-KR');
+    const locale = i18n.language === 'ko' ? 'ko-KR' : 'en-US';
+    return date.toLocaleDateString(locale);
   };
 
   if (watchedReposCount === 0) {
     return (
       <div className="empty-state">
         <div className="empty-icon">📋</div>
-        <h2>관심 목록이 비어있습니다</h2>
-        <p>Repositories 탭에서 관심 있는 저장소를 추가해주세요.</p>
+        <h2>{t('emptyState.noWatchedRepos')}</h2>
+        <p>{t('emptyState.addReposDescription')}</p>
       </div>
     );
   }
@@ -94,7 +97,7 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>Pull Request를 불러오는 중...</p>
+        <p>{t('loading.pullRequests')}</p>
       </div>
     );
   }
@@ -108,12 +111,12 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
             onChange={(e) => setFilterRepo(e.target.value)}
             className="filter-select"
           >
-            <option value="all">모든 저장소 ({pullRequests.length}개)</option>
+            <option value="all">{t('filters.allRepositories', { count: pullRequests.length })}</option>
             {repositories.map(repo => {
               const count = pullRequests.filter(pr => pr.repository.full_name === repo).length;
               return (
                 <option key={repo} value={repo}>
-                  {repo} ({count}개)
+                  {repo} {t('filters.itemCount', { count })}
                 </option>
               );
             })}
@@ -124,16 +127,16 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
             onChange={(e) => setSortBy(e.target.value as any)}
             className="sort-select"
           >
-            <option value="updated">최근 업데이트순</option>
-            <option value="created">생성일순</option>
-            <option value="repository">저장소명순</option>
+            <option value="updated">{t('sort.recentUpdates')}</option>
+            <option value="created">{t('sort.creationDate')}</option>
+            <option value="repository">{t('sort.repositoryName')}</option>
           </select>
         </div>
         
         {loading && (
           <div className="loading-indicator">
             <span className="spinner-small"></span>
-            업데이트 중...
+{t('loading.updating')}
           </div>
         )}
       </div>
@@ -141,8 +144,8 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
       {filteredAndSortedPRs.length === 0 ? (
         <div className="empty-state">
           <div className="empty-icon">🎉</div>
-          <h2>Pull Request가 없습니다</h2>
-          <p>관심 목록의 저장소에 현재 열린 Pull Request가 없습니다.</p>
+          <h2>{t('emptyState.noPullRequests')}</h2>
+          <p>{t('emptyState.noPullRequestsDescription')}</p>
         </div>
       ) : (
         <div className="pr-items">
@@ -161,12 +164,12 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
                   {pr.isApproved ? (
                     <div className="approval-status approved">
                       <span className="approval-icon">✅</span>
-                      <span className="approval-text">{pr.approvedCount} 승인</span>
+                      <span className="approval-text">{t('pullRequest.approvalCount', { count: pr.approvedCount })}</span>
                     </div>
                   ) : (
                     <div className="approval-status pending">
                       <span className="approval-icon">⏳</span>
-                      <span className="approval-text">승인 대기</span>
+                      <span className="approval-text">{t('pullRequest.pendingApproval')}</span>
                     </div>
                   )}
                 </div>
@@ -184,7 +187,7 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
                 
                 <div className="pr-stats">
                   {(pr.totalComments || (pr.comments + pr.review_comments)) > 0 && (
-                    <span className="stat">💬 {pr.totalComments || (pr.comments + pr.review_comments)} 댓글</span>
+                    <span className="stat">💬 {t('pullRequest.commentsCount', { count: pr.totalComments || (pr.comments + pr.review_comments) })}</span>
                   )}
                   {typeof pr.commits === 'number' && (
                     <span className="stat">📦 {pr.commits} commits</span>
@@ -198,8 +201,8 @@ const PullRequestList: React.FC<PullRequestListProps> = ({
                 </div>
                 
                 <div className="pr-timing">
-                  <span className="created">생성: {formatTimeAgo(pr.created_at)}</span>
-                  <span className="updated">업데이트: {formatTimeAgo(pr.updated_at)}</span>
+                  <span className="created">{t('pullRequest.created', { time: formatTimeAgo(pr.created_at) })}</span>
+                  <span className="updated">{t('pullRequest.updated', { time: formatTimeAgo(pr.updated_at) })}</span>
                 </div>
               </div>
 

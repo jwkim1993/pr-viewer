@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface RepositoryManagerProps {
   watchedRepos: any[];
@@ -9,6 +10,7 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
   watchedRepos, 
   onReposUpdated 
 }) => {
+  const { t, i18n } = useTranslation('dashboard');
   const [userRepos, setUserRepos] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +60,7 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
     return (
       <div className="loading-container">
         <div className="spinner"></div>
-        <p>저장소 목록을 불러오는 중...</p>
+        <p>{t('loading.repositories')}</p>
       </div>
     );
   }
@@ -66,11 +68,11 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
   return (
     <div className="repository-manager">
       <div className="watched-repos-section">
-        <h2>관심 목록 ({watchedRepos.length}개)</h2>
+        <h2>{t('repository.watchedListTitle', { count: watchedRepos.length })}</h2>
         {watchedRepos.length === 0 ? (
           <div className="empty-state">
-            <p>아직 관심 목록에 추가된 저장소가 없습니다.</p>
-            <p>아래에서 저장소를 선택하여 관심 목록에 추가해보세요.</p>
+            <p>{t('repository.noWatchedRepos')}</p>
+            <p>{t('repository.addReposHint')}</p>
           </div>
         ) : (
           <div className="repo-grid">
@@ -81,16 +83,16 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
                   <button
                     className="remove-button"
                     onClick={() => removeFromWatch(repo)}
-                    title="관심 목록에서 제거"
+                    title={t('repository.removeFromWatchlist')}
                   >
                     ✕
                   </button>
                 </div>
-                <p className="repo-description">{repo.description || '설명 없음'}</p>
+                <p className="repo-description">{repo.description || t('repository.noDescription')}</p>
                 <div className="repo-meta">
                   <span className="language">{repo.language || 'Unknown'}</span>
                   <span className="updated">
-                    {new Date(repo.updated_at).toLocaleDateString('ko-KR')}
+                    {new Date(repo.updated_at).toLocaleDateString(i18n.language === 'ko' ? 'ko-KR' : 'en-US')}
                   </span>
                 </div>
               </div>
@@ -101,11 +103,11 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
 
       <div className="available-repos-section">
         <div className="section-header">
-          <h2>사용 가능한 저장소 ({filteredRepos.length}개)</h2>
+          <h2>{t('repository.availableReposTitle', { count: filteredRepos.length })}</h2>
           <div className="search-container">
             <input
               type="text"
-              placeholder="저장소 검색..."
+              placeholder={t('repository.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -122,15 +124,15 @@ const RepositoryManager: React.FC<RepositoryManagerProps> = ({
                   className="watch-button"
                   onClick={() => toggleWatch(repo)}
                 >
-                  관심 목록에 추가
+{t('repository.addToWatchlist')}
                 </button>
               </div>
-              <p className="repo-description">{repo.description || '설명 없음'}</p>
+              <p className="repo-description">{repo.description || t('repository.noDescription')}</p>
               <div className="repo-meta">
                 <span className="language">{repo.language || 'Unknown'}</span>
                 <span className="stars">⭐ {repo.stargazers_count}</span>
                 <span className="updated">
-                  {new Date(repo.updated_at).toLocaleDateString('ko-KR')}
+                  {new Date(repo.updated_at).toLocaleDateString(i18n.language === 'ko' ? 'ko-KR' : 'en-US')}
                 </span>
               </div>
               {repo.private && (

@@ -1,0 +1,45 @@
+{
+  "app": {
+    "title": "GitHub PR Viewer",
+    "description": "Monitor GitHub Pull Requests",
+    "loginDescription": "Login with your GitHub account to monitor Pull Requests from your repositories."
+  },
+  "buttons": {
+    "login": "Login with GitHub",
+    "logout": "Logout",
+    "cancel": "Cancel",
+    "close": "Close",
+    "quit": "Quit",
+    "show": "Show",
+    "hide": "Hide",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "settings": "Settings"
+  },
+  "menu": {
+    "show": "Show",
+    "hide": "Hide",
+    "widgetMode": "Widget Mode",
+    "language": "Language",
+    "quit": "Quit"
+  },
+  "language": {
+    "korean": "한국어",
+    "english": "English",
+    "selectLanguage": "Select Language"
+  },
+  "settings": {
+    "language": {
+      "title": "Language Settings",
+      "description": "Select the language to use in the application."
+    },
+    "general": {
+      "title": "General Settings",
+      "description": "Manage general application settings.",
+      "autoStart": "Start automatically on boot (TODO: Not implemented)",
+      "refreshInterval": "Refresh interval (minutes)"
+    }
+  },
+  "loading": "Loading..."
+}

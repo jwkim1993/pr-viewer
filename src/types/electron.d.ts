@@ -10,6 +10,11 @@ export interface ElectronAPI {
   toggleWidgetMode: () => Promise<void>;
   getWidgetMode: () => Promise<boolean>;
   onWidgetModeChanged: (callback: (isWidget: boolean) => void) => void;
+  setLanguage: (language: string) => Promise<void>;
+  getLanguage: () => Promise<string>;
+  onLanguageChanged?: (callback: (language: string) => void) => void;
+  setRefreshInterval: (interval: number) => Promise<void>;
+  getRefreshInterval: () => Promise<number>;
 }
 
 declare global {

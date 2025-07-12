@@ -1,42 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
 
-interface ElectronAPI {
-  getAccessToken: () => Promise<string>;
-  setAccessToken: (token: string) => Promise<void>;
-  getWatchedRepos: () => Promise<any[]>;
-  setWatchedRepos: (repos: any[]) => Promise<void>;
-  githubOAuth: () => Promise<string>;
-  fetchUserRepos: () => Promise<any[]>;
-  fetchPullRequests: (repos: any[]) => Promise<any[]>;
-  openExternal: (url: string) => Promise<void>;
-}
-
-declare global {
-  interface Window {
-    electronAPI: ElectronAPI;
-  }
-}
-
 const App: React.FC = () => {
+  const { i18n, t } = useTranslation('common');
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const initializeApp = async () => {
       try {
+        // Load saved language preference
+        const savedLanguage = await window.electronAPI.getLanguage();
+        if (savedLanguage && savedLanguage !== i18n.language) {
+          await i18n.changeLanguage(savedLanguage);
+        }
+
+        // Check authentication
         const token = await window.electronAPI.getAccessToken();
         setAccessToken(token);
       } catch (error) {
-        console.error('Error checking auth:', error);
+        console.error('Error initializing app:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkAuth();
-  }, []);
+    // Listen for language changes from main process (tray menu)
+    const handleLanguageChange = (language: string) => {
+      i18n.changeLanguage(language);
+    };
+
+    // Set up IPC listener for language changes (this would need to be added to preload)
+    if (window.electronAPI.onLanguageChanged) {
+      window.electronAPI.onLanguageChanged(handleLanguageChange);
+    }
+
+    initializeApp();
+  }, [i18n]);
 
   const handleLogin = async () => {
     try {
@@ -46,7 +48,16 @@ const App: React.FC = () => {
       setAccessToken(token);
     } catch (error) {
       console.error('Login failed:', error);
-      alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      
+      // Check if error is due to user cancellation
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('cancelled') || errorMessage.includes('canceled')) {
+        // User cancelled - just return to login screen without showing error
+        console.log('Login cancelled by user');
+      } else {
+        // Actual error - show error message
+        alert(t('auth:errors.networkError'));
+      }
     } finally {
       setLoading(false);
     }
@@ -61,7 +72,7 @@ const App: React.FC = () => {
     return (
       <div className="loading-screen">
         <div className="spinner"></div>
-        <p>로딩 중...</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }

@@ -1,0 +1,81 @@
+{
+  "title": "대시보드",
+  "lastUpdated": "마지막 업데이트",
+  "refreshing": "새로고침 중...",
+  "switchToWidgetMode": "위젯 모드로 전환",
+  "switchToNormalMode": "일반 모드로 전환",
+  "pullRequests": {
+    "title": "Pull Requests",
+    "empty": "감시할 저장소가 없습니다",
+    "loading": "Pull Request를 불러오는 중...",
+    "error": "Pull Request를 불러오는 중 오류가 발생했습니다",
+    "refresh": "새로고침",
+    "openInGitHub": "GitHub에서 보기"
+  },
+  "repository": {
+    "title": "저장소",
+    "add": "저장소 추가",
+    "remove": "저장소 제거",
+    "watching": "감시 중인 저장소",
+    "available": "사용 가능한 저장소",
+    "search": "저장소 검색",
+    "noRepos": "저장소가 없습니다",
+    "loadingRepos": "저장소를 불러오는 중...",
+    "watchedListTitle": "관심 목록 ({{count}}개)",
+    "noWatchedRepos": "아직 관심 목록에 추가된 저장소가 없습니다.",
+    "addReposHint": "아래에서 저장소를 선택하여 관심 목록에 추가해보세요.",
+    "removeFromWatchlist": "관심 목록에서 제거",
+    "noDescription": "설명 없음",
+    "availableReposTitle": "사용 가능한 저장소 ({{count}}개)",
+    "searchPlaceholder": "저장소 검색...",
+    "addToWatchlist": "관심 목록에 추가"
+  },
+  "loading": {
+    "pullRequests": "Pull Request를 불러오는 중...",
+    "repositories": "저장소 목록을 불러오는 중...",
+    "updating": "업데이트 중..."
+  },
+  "emptyState": {
+    "noWatchedRepos": "관심 목록이 비어있습니다",
+    "addReposDescription": "Repositories 탭에서 관심 있는 저장소를 추가해주세요.",
+    "noPullRequests": "Pull Request가 없습니다",
+    "noPullRequestsDescription": "관심 목록의 저장소에 현재 열린 Pull Request가 없습니다."
+  },
+  "filters": {
+    "allRepositories": "모든 저장소 ({{count}}개)",
+    "itemCount": "({{count}}개)"
+  },
+  "sort": {
+    "recentUpdates": "최근 업데이트순",
+    "creationDate": "생성일순",
+    "repositoryName": "저장소명순"
+  },
+  "pullRequest": {
+    "approvalCount": "{{count}} 승인",
+    "pendingApproval": "승인 대기",
+    "commentsCount": "{{count}} 댓글",
+    "created": "생성: {{time}}",
+    "updated": "업데이트: {{time}}"
+  },
+  "status": {
+    "open": "열림",
+    "closed": "닫힘",
+    "merged": "병합됨",
+    "approved": "승인됨",
+    "changes_requested": "변경 요청",
+    "pending": "대기 중"
+  },
+  "time": {
+    "justNow": "방금 전",
+    "minutesAgo": "{{count}}분 전",
+    "hoursAgo": "{{count}}시간 전",
+    "daysAgo": "{{count}}일 전",
+    "weeksAgo": "{{count}}주 전",
+    "monthsAgo": "{{count}}개월 전"
+  },
+  "stats": {
+    "comments": "댓글 {{count}}개",
+    "approvals": "승인 {{count}}개",
+    "reviews": "리뷰 {{count}}개"
+  }
+}

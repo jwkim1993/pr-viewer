@@ -1,22 +1,51 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import RepositoryManager from './RepositoryManager';
 import PullRequestList from './PullRequestList';
+import Settings from './Settings';
 
 interface DashboardProps {
   onLogout: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
-  const [activeTab, setActiveTab] = useState<'prs' | 'repos'>('prs');
+  const { t } = useTranslation(['common', 'dashboard']);
+  const [activeTab, setActiveTab] = useState<'prs' | 'repos' | 'settings'>('prs');
+
   const [watchedRepos, setWatchedRepos] = useState<any[]>([]);
   const [pullRequests, setPullRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isWidgetMode, setIsWidgetMode] = useState(false);
+  const [refreshInterval, setRefreshInterval] = useState<number>(5);
 
   useEffect(() => {
     loadWatchedRepos();
     initializeWidgetMode();
+    loadRefreshInterval();
+  }, []);
+
+  const loadRefreshInterval = async () => {
+    try {
+      const interval = await window.electronAPI.getRefreshInterval();
+      setRefreshInterval(interval || 5);
+    } catch (error) {
+      console.error('Error loading refresh interval:', error);
+    }
+  };
+
+  // Listen for refresh interval changes
+  useEffect(() => {
+    const handleRefreshIntervalChange = () => {
+      loadRefreshInterval();
+    };
+
+    // Add event listener for custom refresh interval change event
+    window.addEventListener('refresh-interval-changed', handleRefreshIntervalChange);
+
+    return () => {
+      window.removeEventListener('refresh-interval-changed', handleRefreshIntervalChange);
+    };
   }, []);
 
   const initializeWidgetMode = async () => {
@@ -41,10 +70,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       if (watchedRepos.length > 0) {
         fetchPullRequests();
       }
-    }, 5 * 60 * 1000);
+    }, refreshInterval * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [watchedRepos]);
+  }, [watchedRepos, refreshInterval]);
 
   const loadWatchedRepos = async () => {
     try {
@@ -83,10 +112,10 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     <div className={`dashboard ${isWidgetMode ? 'widget-mode' : ''}`}>
       <header className="dashboard-header">
         <div className="header-left">
-          <h1>GitHub PR Viewer</h1>
+          <h1>{t('common:app.title')}</h1>
           {lastUpdated && (
             <span className="last-updated">
-              마지막 업데이트: {lastUpdated.toLocaleTimeString()}
+              {t('dashboard:lastUpdated')}: {lastUpdated.toLocaleTimeString()}
             </span>
           )}
         </div>
@@ -98,13 +127,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 className={`tab-button ${activeTab === 'prs' ? 'active' : ''}`}
                 onClick={() => setActiveTab('prs')}
               >
-                Pull Requests ({pullRequests.length})
+{t('dashboard:pullRequests.title')} ({pullRequests.length})
               </button>
               <button
                 className={`tab-button ${activeTab === 'repos' ? 'active' : ''}`}
                 onClick={() => setActiveTab('repos')}
               >
-                Repositories ({watchedRepos.length})
+{t('dashboard:repository.title')} ({watchedRepos.length})
               </button>
             </nav>
           )}
@@ -113,20 +142,29 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <button 
               className={`widget-button ${isWidgetMode ? 'active' : ''}`}
               onClick={toggleWidget}
-              title={isWidgetMode ? '일반 모드로 전환' : '위젯 모드로 전환'}
+              title={isWidgetMode ? t('dashboard:switchToNormalMode') : t('dashboard:switchToWidgetMode')}
             >
               {isWidgetMode ? '📱' : '🖥️'}
             </button>
+            {!isWidgetMode && (
+              <button 
+                className={`widget-button ${activeTab === 'settings' ? 'active' : ''}`}
+                onClick={() => setActiveTab('settings')}
+                title={t('common:buttons.settings')}
+              >
+                ⚙️
+              </button>
+            )}
             <button
               className="refresh-button"
               onClick={fetchPullRequests}
               disabled={loading || watchedRepos.length === 0}
             >
-              {loading ? '새로고침 중...' : '새로고침'}
+{loading ? t('dashboard:refreshing') : t('dashboard:pullRequests.refresh')}
             </button>
             {!isWidgetMode && (
               <button className="logout-button" onClick={onLogout}>
-                로그아웃
+{t('common:buttons.logout')}
               </button>
             )}
           </div>
@@ -140,12 +178,14 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             loading={loading}
             watchedReposCount={watchedRepos.length}
           />
-        ) : (
+        ) : activeTab === 'repos' ? (
           <RepositoryManager 
             watchedRepos={watchedRepos}
             onReposUpdated={handleReposUpdated}
           />
-        )}
+        ) : activeTab === 'settings' ? (
+          <Settings />
+        ) : null}
       </main>
     </div>
   );

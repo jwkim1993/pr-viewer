@@ -9,11 +9,28 @@ const store = new Store();
 // Load configuration
 let config: any = {};
 try {
-  const configPath = path.join(__dirname, '../../config.json');
-  if (fs.existsSync(configPath)) {
+  // Try multiple possible paths for config.json
+  const possiblePaths = [
+    path.join(__dirname, '../../config.json'),          // Development
+    path.join(process.resourcesPath, '../../config.json'), // Production (Mac)
+    path.join(process.cwd(), 'config.json'),            // Working directory
+    path.join(app.getAppPath(), '../config.json'),      // App directory
+  ];
+  
+  let configPath = '';
+  for (const tryPath of possiblePaths) {
+    if (fs.existsSync(tryPath)) {
+      configPath = tryPath;
+      break;
+    }
+  }
+  
+  if (configPath) {
+    console.log('Loading config from:', configPath);
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   } else {
-    console.warn('config.json not found, using environment variables or defaults');
+    console.warn('config.json not found in any expected location, using environment variables or defaults');
+    console.log('Tried paths:', possiblePaths);
   }
 } catch (error) {
   console.error('Error loading config.json:', error);
@@ -123,6 +140,8 @@ const createTray = (): void => {
     tray = new Tray(icon);
   }
   
+  const currentLanguage = store.get('app.language', 'ko') as string;
+  
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'GitHub PR Viewer',
@@ -132,7 +151,7 @@ const createTray = (): void => {
       type: 'separator'
     },
     {
-      label: 'Show',
+      label: currentLanguage === 'ko' ? '보이기' : 'Show',
       click: () => {
         if (mainWindow) {
           mainWindow.show();
@@ -144,7 +163,7 @@ const createTray = (): void => {
       }
     },
     {
-      label: 'Hide',
+      label: currentLanguage === 'ko' ? '숨기기' : 'Hide',
       click: () => {
         if (mainWindow) {
           mainWindow.hide();
@@ -158,7 +177,7 @@ const createTray = (): void => {
       type: 'separator'
     },
     {
-      label: 'Widget Mode',
+      label: currentLanguage === 'ko' ? '위젯 모드' : 'Widget Mode',
       type: 'checkbox',
       checked: isWidgetMode,
       click: toggleWidgetMode
@@ -167,7 +186,35 @@ const createTray = (): void => {
       type: 'separator'
     },
     {
-      label: 'Quit',
+      label: currentLanguage === 'ko' ? '언어' : 'Language',
+      submenu: [
+        {
+          label: '🇰🇷 한국어',
+          type: 'radio',
+          checked: currentLanguage === 'ko',
+          click: () => {
+            store.set('app.language', 'ko');
+            mainWindow?.webContents.send('language-changed', 'ko');
+            createTray(); // Recreate tray with new language
+          }
+        },
+        {
+          label: '🇺🇸 English',
+          type: 'radio',
+          checked: currentLanguage === 'en',
+          click: () => {
+            store.set('app.language', 'en');
+            mainWindow?.webContents.send('language-changed', 'en');
+            createTray(); // Recreate tray with new language
+          }
+        }
+      ]
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: currentLanguage === 'ko' ? '종료' : 'Quit',
       click: () => {
         app.quit();
       }
@@ -1389,4 +1436,31 @@ ipcMain.handle('fetch-pull-requests', async (_, repos: any[]) => {
 
 ipcMain.handle('open-external', (_, url: string) => {
   shell.openExternal(url);
+});
+
+ipcMain.handle('set-language', (_, language: string) => {
+  store.set('app.language', language);
+});
+
+ipcMain.handle('get-language', () => {
+  const savedLanguage = store.get('app.language');
+  if (savedLanguage) {
+    return savedLanguage;
+  }
+  
+  // Auto-detect system language
+  const systemLanguage = app.getLocale();
+  const detectedLanguage = systemLanguage.startsWith('ko') ? 'ko' : 'en';
+  
+  // Save the detected language
+  store.set('app.language', detectedLanguage);
+  return detectedLanguage;
+});
+
+ipcMain.handle('set-refresh-interval', (_, interval: number) => {
+  store.set('app.refreshInterval', interval);
+});
+
+ipcMain.handle('get-refresh-interval', () => {
+  return store.get('app.refreshInterval', 5); // Default to 5 minutes
 });
