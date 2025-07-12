@@ -1,0 +1,761 @@
+/* 기본 스타일 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 로딩 스크린 */
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 로그인 스크린 */
+.login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.login-header p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.github-icon {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.login-button {
+  background: #24292e;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 1rem;
+}
+
+.login-button:hover {
+  background: #1a1e22;
+}
+
+.login-description {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* 대시보드 */
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  padding-top: 28px; /* macOS 트래픽 라이트 버튼을 위한 여백 */
+  position: relative; /* ::before 요소 위치 지정을 위해 필요 */
+}
+
+/* macOS 타이틀바 영역을 드래그 가능하게 만들기 위한 가상 요소 */
+.dashboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px; /* 타이틀바 높이 */
+  -webkit-app-region: drag;
+  z-index: 1000;
+}
+
+.dashboard-header {
+  background: white;
+  border-bottom: 1px solid #e1e4e8;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 8px; /* 추가 여백 */
+  -webkit-app-region: drag; /* 창 드래그 가능하게 만듦 */
+}
+
+.header-left {
+  -webkit-app-region: drag; /* 헤더 왼쪽 영역도 드래그 가능 */
+}
+
+.header-left h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.last-updated {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  -webkit-app-region: drag; /* 헤더 오른쪽 영역도 드래그 가능 */
+}
+
+.tab-nav {
+  display: flex;
+  gap: 0.5rem;
+  -webkit-app-region: drag; /* 탭 네비게이션 영역 드래그 가능 */
+  padding: 4px 8px; /* 드래그 가능한 영역 확대 */
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  -webkit-app-region: no-drag; /* 버튼 클릭 가능하게 유지 */
+}
+
+.tab-button:hover {
+  background: #f1f3f4;
+}
+
+.tab-button.active {
+  background: #0969da;
+  color: white;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  -webkit-app-region: drag; /* 헤더 액션 영역도 드래그 가능 */
+  padding: 4px 8px; /* 드래그 가능한 영역 확대 */
+}
+
+.refresh-button, .logout-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d9e0;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  -webkit-app-region: no-drag; /* 버튼 클릭 가능하게 유지 */
+}
+
+.refresh-button:hover {
+  background: #f1f3f4;
+}
+
+.refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.logout-button {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.logout-button:hover {
+  background: #c82333;
+}
+
+.widget-button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d9e0;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 16px;
+  -webkit-app-region: no-drag; /* 버튼 클릭 가능하게 유지 */
+}
+
+.widget-button:hover {
+  background: #f1f3f4;
+}
+
+.widget-button.active {
+  background: #0969da;
+  border-color: #0969da;
+  transform: scale(1.1);
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow: auto;
+  padding: 2rem;
+}
+
+/* 위젯 모드 스타일 */
+.dashboard.widget-mode {
+  padding-top: 0; /* 위젯에서는 트래픽 라이트 여백 제거 */
+}
+
+.dashboard.widget-mode .dashboard-header {
+  padding: 0.75rem 1rem; /* 위젯에서 드래그 영역을 더 넓게 */
+  margin-top: 0;
+  min-height: 48px; /* 드래그하기 충분한 높이 보장 */
+}
+
+.dashboard.widget-mode .dashboard-header h1 {
+  font-size: 1.1rem;
+}
+
+.dashboard.widget-mode .last-updated {
+  font-size: 0.7rem;
+}
+
+.dashboard-content.widget-mode {
+  padding: 0.5rem;
+}
+
+.dashboard-content.widget-mode .pull-request-list {
+  max-width: none;
+  margin: 0;
+}
+
+.dashboard-content.widget-mode .list-controls {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: none; /* 위젯에서는 필터 숨김 */
+}
+
+.dashboard-content.widget-mode .pr-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-content.widget-mode .pr-title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-content.widget-mode .pr-details {
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-content.widget-mode .pr-stats {
+  font-size: 0.8rem;
+}
+
+.dashboard-content.widget-mode .pr-timing {
+  font-size: 0.75rem;
+}
+
+.dashboard-content.widget-mode .pr-header {
+  margin-bottom: 0.75rem; /* 제목과 다음 섹션 간 충분한 간격 */
+  gap: 0.5rem; /* 위젯에서는 더 작은 간격 */
+}
+
+.dashboard-content.widget-mode .pr-title {
+  margin-bottom: 0.5rem; /* 제목과 메타 정보 간 간격 */
+  font-size: 0.95rem;
+}
+
+.dashboard-content.widget-mode .pr-status {
+  margin-top: 0.25rem; /* 상태 표시 상단 여백 */
+}
+
+.dashboard-content.widget-mode .approval-status {
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  min-width: 85px; /* 위젯에서도 충분한 너비 보장 */
+}
+
+.dashboard-content.widget-mode .approval-text {
+  font-size: 0.65rem;
+}
+
+.dashboard-content.widget-mode .pr-meta {
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* 저장소 관리자 */
+.repository-manager {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.watched-repos-section, .available-repos-section {
+  margin-bottom: 3rem;
+}
+
+.watched-repos-section h2, .available-repos-section h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.search-container {
+  max-width: 300px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+
+.repo-card {
+  background: white;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  -webkit-app-region: no-drag; /* 저장소 카드 클릭 가능하게 유지 */
+}
+
+.repo-card:hover {
+  border-color: #0969da;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.repo-card.watched {
+  border-color: #28a745;
+  background: #f8fff9;
+}
+
+.repo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.repo-header h3 {
+  font-size: 1rem;
+  color: #0969da;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.watch-button, .remove-button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #d1d9e0;
+  background: white;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.watch-button.watched {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.remove-button {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.repo-description {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.repo-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.private-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ffd33d;
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Pull Request 리스트 */
+.pull-request-list {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.list-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-select, .sort-select {
+  padding: 6px 10px;
+  border: 1px solid #d1d9e0;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.pr-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pr-item {
+  background: white;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-app-region: no-drag; /* PR 아이템 클릭 가능하게 유지 */
+}
+
+.pr-item:hover {
+  border-color: #0969da;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.pr-title-section {
+  flex: 1;
+  min-width: 0; /* 플렉스 아이템이 축소될 수 있도록 */
+}
+
+.pr-title {
+  font-size: 1.1rem;
+  color: #0969da;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pr-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+  align-items: center;
+}
+
+.pr-number {
+  font-weight: 600;
+}
+
+.pr-repository {
+  color: #0969da;
+}
+
+.pr-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0; /* 축소되지 않도록 */
+}
+
+.approval-status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  min-width: 100px; /* 더 넓은 최소 너비 보장 */
+  justify-content: center;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+.approval-status.approved {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.approval-status.pending {
+  background: rgba(255, 193, 7, 0.1);
+  color: #856404;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.approval-icon {
+  font-size: 0.9rem;
+}
+
+.approval-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pr-details {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.pr-author {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.author-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.author-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.pr-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.additions {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.deletions {
+  color: #dc3545;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.pr-timing {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+  margin-left: auto;
+}
+
+.pr-labels {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pr-label {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: white;
+  font-weight: 500;
+}
+
+/* 빈 상태 */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.loading-container .spinner {
+  margin-bottom: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .repo-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pr-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .pr-timing {
+    margin-left: 0;
+  }
+  
+  .list-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .filters {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

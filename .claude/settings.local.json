@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(npm run build:*)",
+      "Bash(sips:*)",
+      "Bash(npm run dist:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(python3:*)",
+      "Bash(rm:*)",
+      "Bash(rsvg-convert:*)",
+      "Bash(qlmanage:*)"
+    ],
+    "deny": []
+  }
+}
