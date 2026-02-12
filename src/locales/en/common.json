@@ -39,7 +39,57 @@
       "description": "Manage general application settings.",
       "autoStart": "Start automatically on boot (TODO: Not implemented)",
       "refreshInterval": "Refresh interval (minutes)"
+    },
+    "github": {
+      "title": "GitHub Settings",
+      "description": "Configure GitHub Enterprise or custom GitHub instance endpoints.",
+      "baseUrl": "GitHub Base URL",
+      "baseUrlPlaceholder": "https://github.enterprise.com",
+      "baseUrlDescription": "The base URL for your GitHub instance (e.g., https://github.enterprise.com)",
+      "apiUrl": "GitHub API URL",
+      "apiUrlPlaceholder": "https://github.enterprise.com/api/v3",
+      "apiUrlDescription": "The API URL for your GitHub instance (e.g., https://github.enterprise.com/api/v3)",
+      "saveSettings": "Save GitHub Settings",
+      "resetToDefault": "Reset to GitHub.com",
+      "restartRequired": "Restart the app to apply GitHub endpoint changes",
+      "examples": "Quick Setup Examples",
+      "exampleDefault": "GitHub.com (Default)",
+      "exampleEnterprise": "GitHub Enterprise"
+    },
+    "ai": {
+      "title": "AI Settings",
+      "description": "Configure Claude AI for PR analysis and summarization.",
+      "claudeApiKey": "Claude API Key",
+      "claudeApiKeyPlaceholder": "sk-ant-api03-...",
+      "claudeApiKeyDescription": "Enter your Anthropic Claude API key. You can get one from the Anthropic Console.",
+      "getApiKey": "Get API Key",
+      "saveApiKey": "Save API Key",
+      "removeApiKey": "Remove API Key",
+      "apiKeySet": "API key is configured",
+      "apiKeyNotSet": "API key is not configured",
+      "apiKeySaved": "API key saved successfully",
+      "apiKeyRemoved": "API key removed"
     }
+  },
+  "ai": {
+    "summarizePR": "AI Summary",
+    "summarizeComments": "Summarize Reviews",
+    "resummarize": "Re-summarize",
+    "loading": "Generating AI summary...",
+    "error": "Failed to generate summary. Please check your API key and try again.",
+    "generatedAt": "Generated at",
+    "cached": "(cached)",
+    "noApiKey": "Set up Claude API key in Settings to use AI features.",
+    "closeSummary": "Close",
+    "lgtm": "LGTM",
+    "lgtmConfirm": "Approve this PR and leave a LGTM comment?",
+    "lgtmSuccess": "PR has been approved!",
+    "lgtmError": "Failed to approve PR.",
+    "lgtmLoading": "Approving..."
+  },
+  "login": {
+    "connectingTo": "Connecting to",
+    "changeSettings": "Change settings"
   },
   "loading": "Loading..."
 }

@@ -1,0 +1,10 @@
+{
+  "github": {
+    "clientId": "your-enterprise-client-id",
+    "clientSecret": "your-enterprise-client-secret",
+    "usePublicApp": false,
+    "deviceFlow": false,
+    "baseUrl": "https://github.enterprise.com",
+    "apiUrl": "https://github.enterprise.com/api/v3"
+  }
+}

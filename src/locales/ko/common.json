@@ -39,7 +39,57 @@
       "description": "애플리케이션의 일반적인 설정을 관리합니다.",
       "autoStart": "시작 시 자동 실행 (TODO: 미구현)",
       "refreshInterval": "새로고침 간격 (분)"
+    },
+    "github": {
+      "title": "GitHub 설정",
+      "description": "GitHub Enterprise 또는 사용자 정의 GitHub 인스턴스 엔드포인트를 설정합니다.",
+      "baseUrl": "GitHub 기본 URL",
+      "baseUrlPlaceholder": "https://github.enterprise.com",
+      "baseUrlDescription": "GitHub 인스턴스의 기본 URL (예: https://github.enterprise.com)",
+      "apiUrl": "GitHub API URL",
+      "apiUrlPlaceholder": "https://github.enterprise.com/api/v3",
+      "apiUrlDescription": "GitHub 인스턴스의 API URL (예: https://github.enterprise.com/api/v3)",
+      "saveSettings": "GitHub 설정 저장",
+      "resetToDefault": "GitHub.com으로 재설정",
+      "restartRequired": "GitHub 엔드포인트 변경사항을 적용하려면 앱을 다시 시작하세요",
+      "examples": "빠른 설정 예시",
+      "exampleDefault": "GitHub.com (기본값)",
+      "exampleEnterprise": "GitHub Enterprise"
+    },
+    "ai": {
+      "title": "AI 설정",
+      "description": "PR 분석 및 요약을 위한 Claude AI를 설정합니다.",
+      "claudeApiKey": "Claude API Key",
+      "claudeApiKeyPlaceholder": "sk-ant-api03-...",
+      "claudeApiKeyDescription": "Anthropic Claude API 키를 입력하세요. Anthropic Console에서 발급받을 수 있습니다.",
+      "getApiKey": "API Key 발급받기",
+      "saveApiKey": "API Key 저장",
+      "removeApiKey": "API Key 삭제",
+      "apiKeySet": "API 키가 설정되어 있습니다",
+      "apiKeyNotSet": "API 키가 설정되지 않았습니다",
+      "apiKeySaved": "API 키가 저장되었습니다",
+      "apiKeyRemoved": "API 키가 삭제되었습니다"
     }
+  },
+  "ai": {
+    "summarizePR": "AI 요약",
+    "summarizeComments": "리뷰 요약",
+    "resummarize": "다시 요약",
+    "loading": "AI 요약을 생성하고 있습니다...",
+    "error": "요약 생성에 실패했습니다. API 키를 확인하고 다시 시도해주세요.",
+    "generatedAt": "생성 시각",
+    "cached": "(캐시됨)",
+    "noApiKey": "AI 기능을 사용하려면 설정에서 Claude API 키를 설정하세요.",
+    "closeSummary": "닫기",
+    "lgtm": "LGTM",
+    "lgtmConfirm": "이 PR을 승인하고 LGTM 코멘트를 남기시겠습니까?",
+    "lgtmSuccess": "PR이 승인되었습니다!",
+    "lgtmError": "PR 승인에 실패했습니다.",
+    "lgtmLoading": "승인 중..."
+  },
+  "login": {
+    "connectingTo": "연결 대상",
+    "changeSettings": "설정 변경"
   },
   "loading": "로딩 중..."
 }

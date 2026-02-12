@@ -1,6 +1,6 @@
 {
   "name": "github-pr-viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitHub Pull Request Viewer for Mac",
   "author": "Lunit",
   "main": "dist/main.js",
@@ -9,7 +9,7 @@
     "dev:main": "cross-env NODE_ENV=development webpack --config webpack.main.config.js --mode development --watch",
     "dev:renderer": "cross-env NODE_ENV=development webpack serve --config webpack.renderer.config.js --mode development",
     "build": "npm run build:main && npm run build:renderer",
-    "build:main": "cross-env NODE_ENV=production webpack --config webpack.main.config.js --mode production",
+    "build:main": "cross-env NODE_ENV=production GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID} webpack --config webpack.main.config.js --mode production",
     "build:renderer": "cross-env NODE_ENV=production webpack --config webpack.renderer.config.js --mode production",
     "start": "electron dist/main.js",
     "pack": "electron-builder --dir",
@@ -24,7 +24,8 @@
     },
     "files": [
       "dist/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "config.public.json"
     ],
     "extraFiles": [
       "assets/**/*"
@@ -32,6 +33,10 @@
     "mac": {
       "icon": "assets/icons/icon.png",
       "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
@@ -92,6 +97,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@octokit/rest": "^20.0.0",
     "electron-store": "^8.1.0",
     "i18next": "^25.3.2",

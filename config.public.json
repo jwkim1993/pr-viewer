@@ -1,0 +1,9 @@
+{
+  "github": {
+    "clientId": "Ov23liZf8QRqZ6QjHNQF",
+    "usePublicApp": true,
+    "deviceFlow": true,
+    "baseUrl": "https://github.com",
+    "apiUrl": "https://api.github.com"
+  }
+}

@@ -1,3 +1,14 @@
+export interface AISummaryResult {
+  summary: string;
+  timestamp: number;
+  fromCache: boolean;
+}
+
+export interface ClaudeApiKeyInfo {
+  hasKey: boolean;
+  maskedKey: string;
+}
+
 export interface ElectronAPI {
   getAccessToken: () => Promise<string>;
   setAccessToken: (token: string) => Promise<void>;
@@ -15,6 +26,23 @@ export interface ElectronAPI {
   onLanguageChanged?: (callback: (language: string) => void) => void;
   setRefreshInterval: (interval: number) => Promise<void>;
   getRefreshInterval: () => Promise<number>;
+  getGitHubConfig: () => Promise<{
+    clientId: string;
+    clientSecret: string;
+    baseUrl: string;
+    apiUrl: string;
+  }>;
+  setGitHubEndpoints: (baseUrl: string, apiUrl: string) => Promise<void>;
+  // Claude AI
+  setClaudeApiKey: (key: string) => Promise<void>;
+  getClaudeApiKey: () => Promise<ClaudeApiKeyInfo>;
+  removeClaudeApiKey: () => Promise<void>;
+  summarizePR: (owner: string, repo: string, prNumber: number) => Promise<AISummaryResult>;
+  summarizePRComments: (owner: string, repo: string, prNumber: number) => Promise<AISummaryResult>;
+  getPRSummaryCache: (owner: string, repo: string, prNumber: number, type: 'pr' | 'comments') => Promise<AISummaryResult | null>;
+  clearPRSummaryCache: (owner: string, repo: string, prNumber: number, type: 'pr' | 'comments') => Promise<void>;
+  // GitHub Actions
+  approvePRLgtm: (owner: string, repo: string, prNumber: number) => Promise<{ success: boolean }>;
 }
 
 declare global {

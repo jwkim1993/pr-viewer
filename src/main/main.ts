@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import Store from 'electron-store';
 import { Octokit } from '@octokit/rest';
+import Anthropic from '@anthropic-ai/sdk';
 
 const store = new Store();
 
@@ -40,7 +41,9 @@ try {
 const getGitHubConfig = () => {
   return {
     clientId: config.github?.clientId || process.env.GITHUB_CLIENT_ID || '',
-    clientSecret: config.github?.clientSecret || process.env.GITHUB_CLIENT_SECRET || ''
+    clientSecret: config.github?.clientSecret || process.env.GITHUB_CLIENT_SECRET || '',
+    baseUrl: store.get('github.baseUrl') as string || config.github?.baseUrl || process.env.GITHUB_BASE_URL || 'https://github.com',
+    apiUrl: store.get('github.apiUrl') as string || config.github?.apiUrl || process.env.GITHUB_API_URL || 'https://api.github.com'
   };
 };
 
@@ -675,9 +678,9 @@ async function showDeviceFlowError() {
 async function startDeviceFlow() {
   try {
     console.log('Attempting Device Flow...');
-    const { clientId } = getGitHubConfig();
+    const { clientId, baseUrl } = getGitHubConfig();
     
-    const deviceResponse = await fetch('https://github.com/login/device/code', {
+    const deviceResponse = await fetch(`${baseUrl}/login/device/code`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -842,7 +845,8 @@ async function startDeviceFlow() {
         }
         
         try {
-          const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+          const { baseUrl } = getGitHubConfig();
+          const tokenResponse = await fetch(`${baseUrl}/login/oauth/access_token`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -888,6 +892,8 @@ async function startDeviceFlow() {
 
 // OAuth 설정 함수
 async function startOAuthSetup() {
+  const { baseUrl } = getGitHubConfig();
+  
   const authWindow = new BrowserWindow({
     width: 600,
     height: 700,
@@ -1030,7 +1036,7 @@ async function startOAuthSetup() {
           const { ipcRenderer } = require('electron');
           
           function openGitHubApps() {
-            require('electron').shell.openExternal('https://github.com/settings/developers');
+            require('electron').shell.openExternal('` + baseUrl + `/settings/developers');
           }
           
           function startOAuth() {
@@ -1114,8 +1120,9 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
   const callbackPort = 17183;
   const redirectUri = `http://localhost:${callbackPort}/callback`;
   const scope = 'repo';
+  const { baseUrl } = getGitHubConfig();
   
-  const authUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
+  const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
   
   authWindow.loadURL(authUrl);
   authWindow.show();
@@ -1136,7 +1143,8 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
         if (code) {
           try {
             // 코드로 액세스 토큰 교환
-            const response = await fetch('https://github.com/login/oauth/access_token', {
+            const { baseUrl } = getGitHubConfig();
+            const response = await fetch(`${baseUrl}/login/oauth/access_token`, {
               method: 'POST',
               headers: {
                 'Accept': 'application/json',
@@ -1181,6 +1189,8 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
 
 // Personal Access Token 플로우 함수
 async function startPATFlow() {
+  const { baseUrl } = getGitHubConfig();
+  
   const authWindow = new BrowserWindow({
     width: 600,
     height: 500,
@@ -1288,7 +1298,7 @@ async function startPATFlow() {
           const { ipcRenderer } = require('electron');
           
           function openGitHub() {
-            require('electron').shell.openExternal('https://github.com/settings/tokens');
+            require('electron').shell.openExternal('` + baseUrl + `/settings/tokens');
           }
           
           function saveToken() {
@@ -1358,7 +1368,11 @@ ipcMain.handle('fetch-user-repos', async () => {
   const token = store.get('github.accessToken') as string;
   if (!token) throw new Error('No access token');
 
-  const octokit = new Octokit({ auth: token });
+  const { apiUrl } = getGitHubConfig();
+  const octokit = new Octokit({ 
+    auth: token,
+    baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
+  });
   const { data } = await octokit.rest.repos.listForAuthenticatedUser({
     visibility: 'all',
     sort: 'updated',
@@ -1372,7 +1386,11 @@ ipcMain.handle('fetch-pull-requests', async (_, repos: any[]) => {
   const token = store.get('github.accessToken') as string;
   if (!token) throw new Error('No access token');
 
-  const octokit = new Octokit({ auth: token });
+  const { apiUrl } = getGitHubConfig();
+  const octokit = new Octokit({ 
+    auth: token,
+    baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
+  });
   const allPRs = [];
 
   for (const repo of repos) {
@@ -1463,4 +1481,304 @@ ipcMain.handle('set-refresh-interval', (_, interval: number) => {
 
 ipcMain.handle('get-refresh-interval', () => {
   return store.get('app.refreshInterval', 5); // Default to 5 minutes
+});
+
+ipcMain.handle('get-github-config', () => {
+  return getGitHubConfig();
+});
+
+ipcMain.handle('set-github-endpoints', (_, baseUrl: string, apiUrl: string) => {
+  store.set('github.baseUrl', baseUrl);
+  store.set('github.apiUrl', apiUrl);
+});
+
+// ============================================================
+// Claude AI - API Key Management
+// ============================================================
+
+ipcMain.handle('set-claude-api-key', (_, key: string) => {
+  store.set('ai.claudeApiKey', key);
+});
+
+ipcMain.handle('get-claude-api-key', () => {
+  const key = store.get('ai.claudeApiKey') as string;
+  if (!key) return { hasKey: false, maskedKey: '' };
+  const masked = key.substring(0, 7) + '...' + key.substring(key.length - 4);
+  return { hasKey: true, maskedKey: masked };
+});
+
+ipcMain.handle('remove-claude-api-key', () => {
+  store.delete('ai.claudeApiKey');
+});
+
+// ============================================================
+// Claude AI - PR Summary
+// ============================================================
+
+ipcMain.handle('summarize-pr', async (_, owner: string, repo: string, prNumber: number) => {
+  const claudeApiKey = store.get('ai.claudeApiKey') as string;
+  if (!claudeApiKey) throw new Error('Claude API key is not set');
+
+  // Check cache first
+  const cacheKey = `ai.summaries.pr.${owner}/${repo}/${prNumber}`;
+  const cached = store.get(cacheKey) as { summary: string; timestamp: number } | undefined;
+  if (cached) {
+    return { summary: cached.summary, timestamp: cached.timestamp, fromCache: true };
+  }
+
+  const token = store.get('github.accessToken') as string;
+  if (!token) throw new Error('No GitHub access token');
+
+  const { apiUrl } = getGitHubConfig();
+  const octokit = new Octokit({
+    auth: token,
+    baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
+  });
+
+  // Fetch PR details
+  const { data: pr } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: prNumber,
+  });
+
+  // Fetch changed files with patches
+  const { data: files } = await octokit.rest.pulls.listFiles({
+    owner,
+    repo,
+    pull_number: prNumber,
+    per_page: 100,
+  });
+
+  // Build context for Claude
+  const filesContext = files.map(f => {
+    let entry = `File: ${f.filename} (${f.status}, +${f.additions} -${f.deletions})`;
+    if (f.patch) {
+      entry += `\n\`\`\`diff\n${f.patch}\n\`\`\``;
+    }
+    return entry;
+  }).join('\n\n');
+
+  // Detect user language for response
+  const language = (store.get('app.language') as string) || 'en';
+  const langInstruction = language === 'ko'
+    ? '한국어로 답변해주세요.'
+    : 'Please respond in English.';
+
+  const prompt = `You are a code review assistant. Analyze the following Pull Request and provide a concise summary.
+
+${langInstruction}
+
+## PR Information
+- Title: ${pr.title}
+- Author: ${pr.user?.login || 'unknown'}
+- Branch: ${pr.head.ref} → ${pr.base.ref}
+- Changed files: ${files.length}
+- Additions: ${pr.additions}, Deletions: ${pr.deletions}
+
+## PR Description
+${pr.body || '(No description provided)'}
+
+## Changed Files and Diffs
+${filesContext}
+
+## Instructions
+Please provide:
+1. A brief overall summary of what this PR does (2-3 sentences)
+2. Key changes organized by category (e.g., features, bug fixes, refactoring)
+3. Any potential concerns or areas that might need attention
+
+Keep the summary concise but informative.`;
+
+  const anthropic = new Anthropic({ apiKey: claudeApiKey });
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const summary = message.content
+    .filter((block: any) => block.type === 'text')
+    .map((block: any) => block.text)
+    .join('\n');
+
+  const timestamp = Date.now();
+  store.set(cacheKey, { summary, timestamp, model: 'claude-sonnet-4-20250514' });
+
+  return { summary, timestamp, fromCache: false };
+});
+
+// ============================================================
+// Claude AI - PR Comments/Reviews Summary
+// ============================================================
+
+ipcMain.handle('summarize-pr-comments', async (_, owner: string, repo: string, prNumber: number) => {
+  const claudeApiKey = store.get('ai.claudeApiKey') as string;
+  if (!claudeApiKey) throw new Error('Claude API key is not set');
+
+  // Check cache first
+  const cacheKey = `ai.summaries.comments.${owner}/${repo}/${prNumber}`;
+  const cached = store.get(cacheKey) as { summary: string; timestamp: number } | undefined;
+  if (cached) {
+    return { summary: cached.summary, timestamp: cached.timestamp, fromCache: true };
+  }
+
+  const token = store.get('github.accessToken') as string;
+  if (!token) throw new Error('No GitHub access token');
+
+  const { apiUrl } = getGitHubConfig();
+  const octokit = new Octokit({
+    auth: token,
+    baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
+  });
+
+  // Fetch PR details for context
+  const { data: pr } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: prNumber,
+  });
+
+  // Fetch all reviews, review comments, and issue comments in parallel
+  const [reviewsResponse, reviewCommentsResponse, issueCommentsResponse] = await Promise.all([
+    octokit.rest.pulls.listReviews({
+      owner,
+      repo,
+      pull_number: prNumber,
+      per_page: 100,
+    }),
+    octokit.rest.pulls.listReviewComments({
+      owner,
+      repo,
+      pull_number: prNumber,
+      per_page: 100,
+    }),
+    octokit.rest.issues.listComments({
+      owner,
+      repo,
+      issue_number: prNumber,
+      per_page: 100,
+    }),
+  ]);
+
+  const reviews = reviewsResponse.data;
+  const reviewComments = reviewCommentsResponse.data;
+  const issueComments = issueCommentsResponse.data;
+
+  // Build reviews context
+  const reviewsContext = reviews
+    .filter(r => r.body || r.state !== 'COMMENTED')
+    .map(r => `[Review by ${r.user?.login || 'unknown'} - ${r.state}]${r.body ? '\n' + r.body : ''}`)
+    .join('\n\n');
+
+  // Build review comments context (inline code comments)
+  const reviewCommentsContext = reviewComments
+    .map(c => `[Inline comment by ${c.user?.login || 'unknown'} on ${c.path}:${c.line || c.original_line || '?'}]\n${c.body}`)
+    .join('\n\n');
+
+  // Build issue comments context (general PR comments)
+  const issueCommentsContext = issueComments
+    .map(c => `[Comment by ${c.user?.login || 'unknown'}]\n${c.body}`)
+    .join('\n\n');
+
+  if (!reviewsContext && !reviewCommentsContext && !issueCommentsContext) {
+    const noCommentsMsg = (store.get('app.language') as string) === 'ko'
+      ? '이 PR에는 리뷰나 댓글이 없습니다.'
+      : 'There are no reviews or comments on this PR.';
+    return { summary: noCommentsMsg, timestamp: Date.now(), fromCache: false };
+  }
+
+  // Detect user language for response
+  const language = (store.get('app.language') as string) || 'en';
+  const langInstruction = language === 'ko'
+    ? '한국어로 답변해주세요.'
+    : 'Please respond in English.';
+
+  const prompt = `You are a code review assistant. Analyze the following Pull Request reviews and comments, then provide a concise summary.
+
+${langInstruction}
+
+## PR Information
+- Title: ${pr.title}
+- Author: ${pr.user?.login || 'unknown'}
+- PR #${prNumber} in ${owner}/${repo}
+
+## Reviews (${reviews.length} total)
+${reviewsContext || '(No reviews)'}
+
+## Inline Code Comments (${reviewComments.length} total)
+${reviewCommentsContext || '(No inline comments)'}
+
+## General Comments (${issueComments.length} total)
+${issueCommentsContext || '(No general comments)'}
+
+## Instructions
+Please provide:
+1. Overall review status (approved, changes requested, pending)
+2. Key discussion points and feedback themes
+3. Specific changes requested by reviewers (if any)
+4. Any unresolved concerns or open questions
+
+Keep the summary concise but capture all important feedback.`;
+
+  const anthropic = new Anthropic({ apiKey: claudeApiKey });
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const summary = message.content
+    .filter((block: any) => block.type === 'text')
+    .map((block: any) => block.text)
+    .join('\n');
+
+  const timestamp = Date.now();
+  store.set(cacheKey, { summary, timestamp, model: 'claude-sonnet-4-20250514' });
+
+  return { summary, timestamp, fromCache: false };
+});
+
+// ============================================================
+// Claude AI - Cache Management
+// ============================================================
+
+ipcMain.handle('get-pr-summary-cache', (_, owner: string, repo: string, prNumber: number, type: 'pr' | 'comments') => {
+  const cacheKey = `ai.summaries.${type}.${owner}/${repo}/${prNumber}`;
+  const cached = store.get(cacheKey) as { summary: string; timestamp: number } | undefined;
+  if (cached) {
+    return { summary: cached.summary, timestamp: cached.timestamp, fromCache: true };
+  }
+  return null;
+});
+
+ipcMain.handle('clear-pr-summary-cache', (_, owner: string, repo: string, prNumber: number, type: 'pr' | 'comments') => {
+  const cacheKey = `ai.summaries.${type}.${owner}/${repo}/${prNumber}`;
+  store.delete(cacheKey);
+});
+
+// ============================================================
+// GitHub - LGTM (Approve PR + Comment)
+// ============================================================
+
+ipcMain.handle('approve-pr-lgtm', async (_, owner: string, repo: string, prNumber: number) => {
+  const token = store.get('github.accessToken') as string;
+  if (!token) throw new Error('No GitHub access token');
+
+  const { apiUrl } = getGitHubConfig();
+  const octokit = new Octokit({
+    auth: token,
+    baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
+  });
+
+  // Submit approval review with LGTM comment
+  await octokit.rest.pulls.createReview({
+    owner,
+    repo,
+    pull_number: prNumber,
+    event: 'APPROVE',
+    body: 'LGTM 👍',
+  });
+
+  return { success: true };
 });

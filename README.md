@@ -37,6 +37,8 @@ cp config.example.json config.json
 ```
 
 2. **Configure GitHub credentials** in `config.json`:
+
+**For GitHub.com (default):**
 ```json
 {
   "github": {
@@ -44,6 +46,27 @@ cp config.example.json config.json
     "clientSecret": "your_github_client_secret"
   }
 }
+```
+
+**For GitHub Enterprise:**
+```json
+{
+  "github": {
+    "clientId": "your_enterprise_client_id",
+    "clientSecret": "your_enterprise_client_secret",
+    "baseUrl": "https://github.enterprise.com",
+    "apiUrl": "https://github.enterprise.com/api/v3"
+  }
+}
+```
+
+**Alternative: Environment Variables**
+You can also configure endpoints using environment variables:
+```bash
+export GITHUB_BASE_URL="https://github.enterprise.com"
+export GITHUB_API_URL="https://github.enterprise.com/api/v3"
+export GITHUB_CLIENT_ID="your_client_id"
+export GITHUB_CLIENT_SECRET="your_client_secret"
 ```
 
 ### GitHub OAuth App Setup (Optional)
