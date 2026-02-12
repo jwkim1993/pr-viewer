@@ -26,37 +26,54 @@ Your support helps maintain and improve this project. Thank you! ☕
 
 ### Download
 
-[Releases](https://github.com/jwkim1993/pr-viewer/releases) 페이지에서 최신 버전의 `GitHub.PR.Viewer-x.x.x-arm64.zip` 파일을 다운로드하세요.
+Download the latest `GitHub.PR.Viewer-x.x.x-arm64.zip` from the [Releases](https://github.com/jwkim1993/pr-viewer/releases) page.
 
-### Unsigned App 설치 방법
+### First-Time Installation
 
-이 앱은 Apple Developer 인증서로 서명되어 있지 않기 때문에, 처음 실행할 때 macOS Gatekeeper에 의해 차단됩니다. 아래 방법으로 설치할 수 있습니다.
+This app is not signed with an Apple Developer certificate, so macOS Gatekeeper will block it on first launch. Use one of the following methods to open it.
 
-**방법 1: 시스템 설정에서 허용 (권장)**
+**Option 1: Allow in System Settings (Recommended)**
 
-1. 다운로드한 zip 파일의 압축을 풀어 `GitHub PR Viewer.app`을 `/Applications` 폴더로 이동합니다.
-2. 앱을 더블클릭하여 실행합니다.
-3. "Apple에서 확인할 수 없기 때문에 열 수 없습니다" 경고가 나타나면 **확인**을 클릭합니다.
-4. **시스템 설정 → 개인정보 보호 및 보안** 으로 이동합니다.
-5. 하단에 "GitHub PR Viewer" 관련 메시지가 표시됩니다. **확인 없이 열기** 버튼을 클릭합니다.
-6. 확인 다이얼로그에서 **열기**를 클릭합니다.
-7. 이후에는 정상적으로 실행됩니다.
+1. Unzip the downloaded file and move `GitHub PR Viewer.app` to `/Applications`.
+2. Double-click the app to launch it.
+3. A warning dialog will appear saying the app "can't be opened because Apple cannot check it for malicious software." Click **OK**.
+4. Open **System Settings > Privacy & Security**.
+5. Scroll down to find a message about "GitHub PR Viewer." Click **Open Anyway**.
+6. Click **Open** in the confirmation dialog.
+7. The app will launch normally from now on.
 
-**방법 2: 터미널에서 quarantine 속성 제거**
+**Option 2: Remove Quarantine via Terminal (Quickest)**
 
 ```bash
 xattr -cr /Applications/GitHub\ PR\ Viewer.app
 ```
 
-이 명령어를 실행한 후 앱을 더블클릭하면 경고 없이 바로 실행됩니다.
+After running this command, the app will open without any warnings.
 
-**방법 3: 우클릭으로 열기**
+**Option 3: Right-Click to Open**
 
-1. `GitHub PR Viewer.app`을 우클릭(또는 Control + 클릭)합니다.
-2. 메뉴에서 **열기**를 선택합니다.
-3. 경고 다이얼로그에서 **열기**를 클릭합니다.
+1. Right-click (or Control-click) `GitHub PR Viewer.app`.
+2. Select **Open** from the context menu.
+3. Click **Open** in the warning dialog.
 
-> **참고**: 위 과정은 최초 1회만 필요합니다. 한 번 허용하면 이후에는 일반 앱처럼 실행됩니다.
+> **Note**: This process is only required once. After the first successful launch, the app will open normally like any other application.
+
+### Updating from a Previous Version
+
+If you already have an older version installed:
+
+1. **Quit** the running app completely (right-click the Dock icon > Quit, or use the system tray > Quit).
+2. **Delete** the old `GitHub PR Viewer.app` from `/Applications`.
+3. **Move** the new `GitHub PR Viewer.app` from the downloaded zip to `/Applications`.
+4. **Remove quarantine** on the new version (required again for each new download):
+
+```bash
+xattr -cr /Applications/GitHub\ PR\ Viewer.app
+```
+
+5. Launch the app. All your settings (GitHub token, watched repos, AI API key, cached summaries, etc.) are preserved automatically since they are stored separately in `~/Library/Application Support/github-pr-viewer/`.
+
+> **Tip**: If the app still shows the Gatekeeper warning after updating, run the `xattr -cr` command above or use the System Settings method again.
 
 ---
 
