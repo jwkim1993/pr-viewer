@@ -10,12 +10,21 @@ const store = new Store();
 // Load configuration
 let config: any = {};
 try {
-  // Try multiple possible paths for config.json
+  // Try multiple possible paths for config.json (private, gitignored)
   const possiblePaths = [
     path.join(__dirname, '../../config.json'),          // Development
     path.join(process.resourcesPath, '../../config.json'), // Production (Mac)
     path.join(process.cwd(), 'config.json'),            // Working directory
     path.join(app.getAppPath(), '../config.json'),      // App directory
+  ];
+  
+  // Fallback: config.public.json (public, bundled with app)
+  const publicConfigPaths = [
+    path.join(__dirname, '../../config.public.json'),          // Development
+    path.join(process.resourcesPath, '../../config.public.json'), // Production (Mac)
+    path.join(process.cwd(), 'config.public.json'),            // Working directory
+    path.join(app.getAppPath(), '../config.public.json'),      // App directory
+    path.join(app.getAppPath(), 'config.public.json'),         // Inside app.asar
   ];
   
   let configPath = '';
@@ -30,11 +39,26 @@ try {
     console.log('Loading config from:', configPath);
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   } else {
-    console.warn('config.json not found in any expected location, using environment variables or defaults');
-    console.log('Tried paths:', possiblePaths);
+    // Fallback to config.public.json
+    let publicConfigPath = '';
+    for (const tryPath of publicConfigPaths) {
+      if (fs.existsSync(tryPath)) {
+        publicConfigPath = tryPath;
+        break;
+      }
+    }
+    
+    if (publicConfigPath) {
+      console.log('Loading public config from:', publicConfigPath);
+      config = JSON.parse(fs.readFileSync(publicConfigPath, 'utf8'));
+    } else {
+      console.warn('No config file found, using environment variables or defaults');
+      console.log('Tried config.json paths:', possiblePaths);
+      console.log('Tried config.public.json paths:', publicConfigPaths);
+    }
   }
 } catch (error) {
-  console.error('Error loading config.json:', error);
+  console.error('Error loading config:', error);
 }
 
 // Get GitHub credentials from config or environment variables
