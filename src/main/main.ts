@@ -17,7 +17,7 @@ try {
     path.join(process.cwd(), 'config.json'),            // Working directory
     path.join(app.getAppPath(), '../config.json'),      // App directory
   ];
-  
+
   // Fallback: config.public.json (public, bundled with app)
   const publicConfigPaths = [
     path.join(__dirname, '../../config.public.json'),          // Development
@@ -26,7 +26,7 @@ try {
     path.join(app.getAppPath(), '../config.public.json'),      // App directory
     path.join(app.getAppPath(), 'config.public.json'),         // Inside app.asar
   ];
-  
+
   let configPath = '';
   for (const tryPath of possiblePaths) {
     if (fs.existsSync(tryPath)) {
@@ -34,7 +34,7 @@ try {
       break;
     }
   }
-  
+
   if (configPath) {
     console.log('Loading config from:', configPath);
     config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
@@ -47,7 +47,7 @@ try {
         break;
       }
     }
-    
+
     if (publicConfigPath) {
       console.log('Loading public config from:', publicConfigPath);
       config = JSON.parse(fs.readFileSync(publicConfigPath, 'utf8'));
@@ -112,24 +112,24 @@ const createWindow = (): void => {
 
 const createTray = (): void => {
   let iconPath: string;
-  
+
   if (process.env.NODE_ENV === 'development') {
     iconPath = path.join(__dirname, '../../assets/icons/tray-icon.png');
   } else {
     // 프로덕션에서는 extraResources 폴더 경로 사용
     iconPath = path.join(process.resourcesPath, '..', 'assets', 'icons', 'tray-icon.png');
   }
-  
+
   console.log('Tray icon path:', iconPath);
   console.log('Icon file exists:', require('fs').existsSync(iconPath));
   console.log('process.resourcesPath:', process.resourcesPath);
-  
+
   const icon = nativeImage.createFromPath(iconPath);
   console.log('Icon is empty:', icon.isEmpty());
-  
+
   if (icon.isEmpty()) {
     console.error('Tray icon is empty, trying alternative paths');
-    
+
     // 여러 가능한 경로들을 시도
     const possiblePaths = [
       path.join(process.resourcesPath, 'assets', 'icons', 'tray-icon.png'),
@@ -137,12 +137,12 @@ const createTray = (): void => {
       path.join(app.getAppPath(), 'assets/icons/tray-icon.png'),
       path.join(process.resourcesPath, 'app.asar.unpacked', 'assets', 'icons', 'tray-icon.png')
     ];
-    
+
     let iconFound = false;
     for (const tryPath of possiblePaths) {
       console.log('Trying path:', tryPath);
       console.log('Path exists:', require('fs').existsSync(tryPath));
-      
+
       if (require('fs').existsSync(tryPath)) {
         const tryIcon = nativeImage.createFromPath(tryPath);
         if (!tryIcon.isEmpty()) {
@@ -154,7 +154,7 @@ const createTray = (): void => {
         }
       }
     }
-    
+
     if (!iconFound) {
       // 최후 수단: 시스템 기본 아이콘 사용
       console.error('Using system default icon');
@@ -166,9 +166,9 @@ const createTray = (): void => {
     icon.setTemplateImage(true);
     tray = new Tray(icon);
   }
-  
+
   const currentLanguage = store.get('app.language', 'ko') as string;
-  
+
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'GitHub PR Viewer',
@@ -247,7 +247,7 @@ const createTray = (): void => {
       }
     }
   ]);
-  
+
   tray.setContextMenu(contextMenu);
   tray.setToolTip('GitHub PR Viewer');
 };
@@ -284,14 +284,14 @@ app.on('before-quit', (event) => {
 // 위젯 모드 토글 함수
 const toggleWidgetMode = () => {
   if (!mainWindow) return;
-  
+
   isWidgetMode = !isWidgetMode;
-  
+
   if (isWidgetMode) {
     // 위젯 모드로 전환
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
-    
+
     mainWindow.setSize(400, 600);
     mainWindow.setAlwaysOnTop(true);
     mainWindow.setResizable(false);
@@ -305,7 +305,7 @@ const toggleWidgetMode = () => {
     mainWindow.center();
     mainWindow.setSkipTaskbar(false); // 독에 다시 표시
   }
-  
+
   // renderer에 위젯 모드 상태 전달
   mainWindow.webContents.send('widget-mode-changed', isWidgetMode);
 };
@@ -345,7 +345,7 @@ async function showAuthChoice(): Promise<string> {
       contextIsolation: false,
     },
   });
-  
+
   const choiceHtml = `
     <!DOCTYPE html>
     <html>
@@ -495,21 +495,21 @@ async function showAuthChoice(): Promise<string> {
     </body>
     </html>
   `;
-  
+
   authWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(choiceHtml));
   authWindow.show();
-  
+
   return new Promise<string>((resolve, reject) => {
     let isResolved = false;
-    
+
     const handleAuthChoice = (event: any, data: any) => {
       if (isResolved) return;
-      
+
       console.log('Auth choice received:', data);
       isResolved = true;
       authWindow.close();
       ipcMain.removeListener('auth-choice', handleAuthChoice);
-      
+
       switch (data.type) {
         case 'PAT':
           startPATFlow().then(resolve as any).catch(reject);
@@ -536,9 +536,9 @@ async function showAuthChoice(): Promise<string> {
           reject(new Error('Unknown auth choice'));
       }
     };
-    
+
     ipcMain.on('auth-choice', handleAuthChoice);
-    
+
     authWindow.on('closed', () => {
       if (!isResolved) {
         isResolved = true;
@@ -567,7 +567,7 @@ async function showDeviceFlowError() {
       contextIsolation: false,
     },
   });
-  
+
   const errorHtml = `
     <!DOCTYPE html>
     <html>
@@ -660,21 +660,21 @@ async function showDeviceFlowError() {
     </body>
     </html>
   `;
-  
+
   return new Promise((resolve, reject) => {
     authWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(errorHtml));
     authWindow.show();
-    
+
     let isResolved = false;
-    
+
     const handleErrorAction = (event: any, data: any) => {
       if (isResolved) return;
-      
+
       console.log('Device Flow error action received:', data);
       isResolved = true;
       authWindow.close();
       ipcMain.removeListener('device-flow-error-action', handleErrorAction);
-      
+
       if (data.type === 'USE_PAT') {
         startPATFlow().then(resolve).catch(reject);
       } else if (data.type === 'BACK_TO_CHOICE') {
@@ -684,9 +684,9 @@ async function showDeviceFlowError() {
         reject(new Error('Authentication cancelled'));
       }
     };
-    
+
     ipcMain.on('device-flow-error-action', handleErrorAction);
-    
+
     authWindow.on('closed', () => {
       if (!isResolved) {
         console.log('Device Flow error window closed by user');
@@ -703,7 +703,7 @@ async function startDeviceFlow() {
   try {
     console.log('Attempting Device Flow...');
     const { clientId, baseUrl } = getGitHubConfig();
-    
+
     const deviceResponse = await fetch(`${baseUrl}/login/device/code`, {
       method: 'POST',
       headers: {
@@ -715,13 +715,13 @@ async function startDeviceFlow() {
         scope: 'repo read:user'
       }),
     });
-    
+
     const deviceData = await deviceResponse.json();
-    
+
     if (deviceData.error) {
       throw new Error(`Device Flow not available: ${deviceData.error_description}`);
     }
-    
+
     // Device Flow UI 표시 (이전에 구현한 것과 동일)
     const authWindow = new BrowserWindow({
       width: 600,
@@ -731,7 +731,7 @@ async function startDeviceFlow() {
         contextIsolation: false,
       },
     });
-    
+
     const authHtml = `
       <!DOCTYPE html>
       <html>
@@ -851,15 +851,15 @@ async function startDeviceFlow() {
       </body>
       </html>
     `;
-    
+
     authWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(authHtml));
     authWindow.show();
-    
+
     // 폴링으로 토큰 확인
     const interval = deviceData.interval * 1000 || 5000;
     const expiresIn = deviceData.expires_in * 1000 || 900000;
     const startTime = Date.now();
-    
+
     return new Promise((resolve, reject) => {
       const poll = async () => {
         if (Date.now() - startTime > expiresIn) {
@@ -867,7 +867,7 @@ async function startDeviceFlow() {
           reject(new Error('Device flow expired'));
           return;
         }
-        
+
         try {
           const { baseUrl } = getGitHubConfig();
           const tokenResponse = await fetch(`${baseUrl}/login/oauth/access_token`, {
@@ -882,9 +882,9 @@ async function startDeviceFlow() {
               grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
             }),
           });
-          
+
           const tokenData = await tokenResponse.json();
-          
+
           if (tokenData.access_token) {
             authWindow.close();
             resolve(tokenData.access_token);
@@ -900,14 +900,14 @@ async function startDeviceFlow() {
           setTimeout(poll, interval);
         }
       };
-      
+
       setTimeout(poll, interval);
-      
+
       authWindow.on('closed', () => {
         reject(new Error('Authentication cancelled'));
       });
     });
-    
+
   } catch (error) {
     console.error('Device Flow error:', error);
     throw error;
@@ -917,7 +917,7 @@ async function startDeviceFlow() {
 // OAuth 설정 함수
 async function startOAuthSetup() {
   const { baseUrl } = getGitHubConfig();
-  
+
   const authWindow = new BrowserWindow({
     width: 600,
     height: 700,
@@ -926,7 +926,7 @@ async function startOAuthSetup() {
       contextIsolation: false,
     },
   });
-  
+
   const setupHtml = `
     <!DOCTYPE html>
     <html>
@@ -1091,21 +1091,21 @@ async function startOAuthSetup() {
     </body>
     </html>
   `;
-  
+
   return new Promise((resolve, reject) => {
     authWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(setupHtml));
     authWindow.show();
-    
+
     let isResolved = false;
-    
+
     const handleOAuthSetupAction = (event: any, data: any) => {
       if (isResolved) return;
-      
+
       console.log('OAuth setup action received:', data);
       isResolved = true;
       authWindow.close();
       ipcMain.removeListener('oauth-setup-action', handleOAuthSetupAction);
-      
+
       if (data.type === 'OAUTH_LOGIN') {
         startActualOAuth(data.clientId, data.clientSecret).then(resolve).catch(reject);
       } else if (data.type === 'USE_PAT') {
@@ -1116,9 +1116,9 @@ async function startOAuthSetup() {
         reject(new Error('OAuth setup cancelled'));
       }
     };
-    
+
     ipcMain.on('oauth-setup-action', handleOAuthSetupAction);
-    
+
     authWindow.on('closed', () => {
       if (!isResolved) {
         console.log('OAuth setup window closed by user');
@@ -1145,9 +1145,9 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
   const redirectUri = `http://localhost:${callbackPort}/callback`;
   const scope = 'repo';
   const { baseUrl } = getGitHubConfig();
-  
+
   const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
-  
+
   authWindow.loadURL(authUrl);
   authWindow.show();
 
@@ -1157,13 +1157,13 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
         const urlObj = new URL(url);
         const code = urlObj.searchParams.get('code');
         const error = urlObj.searchParams.get('error');
-        
+
         if (error) {
           authWindow.close();
           reject(new Error(`OAuth error: ${error}`));
           return;
         }
-        
+
         if (code) {
           try {
             // 코드로 액세스 토큰 교환
@@ -1180,10 +1180,10 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
                 code: code,
               }),
             });
-            
+
             const data = await response.json();
             authWindow.close();
-            
+
             if (data.access_token) {
               resolve(data.access_token);
             } else {
@@ -1214,7 +1214,7 @@ async function startActualOAuth(clientId: string, clientSecret: string) {
 // Personal Access Token 플로우 함수
 async function startPATFlow() {
   const { baseUrl } = getGitHubConfig();
-  
+
   const authWindow = new BrowserWindow({
     width: 600,
     height: 500,
@@ -1223,7 +1223,7 @@ async function startPATFlow() {
       contextIsolation: false,
     },
   });
-  
+
   const patHtml = `
     <!DOCTYPE html>
     <html>
@@ -1347,19 +1347,19 @@ async function startPATFlow() {
       </body>
     </html>
   `;
-  
+
   return new Promise((resolve, reject) => {
     authWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(patHtml));
     authWindow.show();
-    
+
     let isResolved = false;
-    
+
     // IPC 리스너 추가
     const handlePATAction = (event: any, data: any) => {
       if (isResolved) return;
-      
+
       console.log('PAT action received:', data);
-      
+
       if (data.type === 'PAT_TOKEN') {
         console.log('PAT token received');
         isResolved = true;
@@ -1374,9 +1374,9 @@ async function startPATFlow() {
         reject(new Error('RESTART_AUTH_CHOICE'));
       }
     };
-    
+
     ipcMain.on('pat-action', handlePATAction);
-    
+
     authWindow.on('closed', () => {
       if (!isResolved) {
         console.log('PAT window closed by user');
@@ -1393,7 +1393,7 @@ ipcMain.handle('fetch-user-repos', async () => {
   if (!token) throw new Error('No access token');
 
   const { apiUrl } = getGitHubConfig();
-  const octokit = new Octokit({ 
+  const octokit = new Octokit({
     auth: token,
     baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
   });
@@ -1402,7 +1402,7 @@ ipcMain.handle('fetch-user-repos', async () => {
     sort: 'updated',
     per_page: 100,
   });
-  
+
   return data;
 });
 
@@ -1411,7 +1411,7 @@ ipcMain.handle('fetch-pull-requests', async (_, repos: any[]) => {
   if (!token) throw new Error('No access token');
 
   const { apiUrl } = getGitHubConfig();
-  const octokit = new Octokit({ 
+  const octokit = new Octokit({
     auth: token,
     baseUrl: apiUrl === 'https://api.github.com' ? undefined : apiUrl
   });
@@ -1429,7 +1429,7 @@ ipcMain.handle('fetch-pull-requests', async (_, repos: any[]) => {
 
       for (const pr of prs) {
         try {
-          const [reviewsResponse, commentsResponse] = await Promise.all([
+          const [reviewsResponse, commentsResponse, reviewCommentsResponse] = await Promise.all([
             octokit.rest.pulls.listReviews({
               owner: repo.owner.login,
               repo: repo.name,
@@ -1439,20 +1439,28 @@ ipcMain.handle('fetch-pull-requests', async (_, repos: any[]) => {
               owner: repo.owner.login,
               repo: repo.name,
               issue_number: pr.number,
+            }),
+            octokit.rest.pulls.listReviewComments({
+              owner: repo.owner.login,
+              repo: repo.name,
+              pull_number: pr.number,
             })
           ]);
 
           const approvedReviews = reviewsResponse.data.filter(review => review.state === 'APPROVED');
           const commentsCount = commentsResponse.data.length;
-          
+          const reviewCommentsCount = reviewCommentsResponse.data.length;
+          const reviewsWithBodyCount = reviewsResponse.data.filter(review => review.body && review.body.trim().length > 0).length;
+          const totalComments = commentsCount + reviewCommentsCount + reviewsWithBodyCount;
+
           allPRs.push({
             ...pr,
             repository: repo,
             approvedCount: approvedReviews.length,
             isApproved: approvedReviews.length > 0,
-            totalComments: commentsCount,
+            totalComments,
             comments: commentsCount,
-            review_comments: 0, // 리뷰 댓글은 별도 API 호출 필요하지만 성능상 생략
+            review_comments: reviewCommentsCount,
           });
         } catch (prError) {
           console.error(`Error fetching details for PR #${pr.number}:`, prError);
@@ -1489,11 +1497,11 @@ ipcMain.handle('get-language', () => {
   if (savedLanguage) {
     return savedLanguage;
   }
-  
+
   // Auto-detect system language
   const systemLanguage = app.getLocale();
   const detectedLanguage = systemLanguage.startsWith('ko') ? 'ko' : 'en';
-  
+
   // Save the detected language
   store.set('app.language', detectedLanguage);
   return detectedLanguage;
